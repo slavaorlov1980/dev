@@ -54,8 +54,10 @@ class BitcoinPrice:
         return rate
 
     # Формула перемножения количества битков на курс с форматирование float с двумя знаками после запятой
-    def _btc_calculate(self, bit_count, rate ):
-        return f"{(bit_count * rate):,.2f}"
+    def _btc_calculate(self, bit_count, rate):
+        res = bit_count * rate
+        print(f'{res = }, {type(res)}')
+        return res
 
     # Форматирование строки с данными конвертации для записи в лог
     def _result(self, bit_count, currency, result):
@@ -91,19 +93,19 @@ if __name__ == '__main__':
 
     # Курс битка в разных валютах
     rate = req.get_rate(currency)
-    print(f'{rate = }')
+    # print(f'{rate = }')
 
     # Расчет и запись в лог конвертации 20 битков в заданных валютах
     bit_count = 20
     calc_data = req.btc_calculate(bit_count, currency)
     req.add_to_log()
-    print(f"{req.data_from_api = }")
+    # print(f"{req.data_from_api = }")
 
     # Расчет и запись в лог конвертации 40 битков в заданных валютах
     bit_count = 40
     calc_data_2 = req.btc_calculate(bit_count,currency)
     req.add_to_log()
-    print(f"{req.data_from_api=}")
+    # print(f"{req.data_from_api=}")
 
 
 # ДЗ 

@@ -1,13 +1,8 @@
-
-[2022-06-02] 20 битков в валюте USD = 596,348.06
-[2022-06-02] 20 битков в валюте EUR = 559,559.35
-[2022-06-02] 40 битков в валюте USD = 1,192,696.13
-[2022-06-02] 40 битков в валюте EUR = 1,119,118.70
-[2022-06-02] 20 битков в валюте USD = 596,855.21
-[2022-06-02] 20 битков в валюте EUR = 560,035.21
-[2022-06-02] 40 битков в валюте USD = 1,193,710.41
-[2022-06-02] 40 битков в валюте EUR = 1,120,070.42
-[2022-06-03] 20 битков в валюте USD = 598,857.57
-[2022-06-03] 20 битков в валюте EUR = 561,914.04
-[2022-06-03] 40 битков в валюте USD = 1,197,715.13
-[2022-06-03] 40 битков в валюте EUR = 1,123,828.09
+[2022-06-09] Function get_btc_rate_by_currency returned 30379.7844
+[2022-06-09] Function get_btc_rate_by_currency returned 30379.7844
+[2022-06-09] Function get_btc_price_by_currency returned 607595.688
+[2022-06-09] Function get_btc_rate_by_currency returned 28435.539
+[2022-06-09] Function get_btc_rate_by_currency returned 28435.539
+[2022-06-09] Function get_btc_price_by_currency returned 568710.78
+[2022-06-09] Function get_btc_rate_by_currency returned 30381.442
+[2022-06-09] Function get_btc_rate_by_currency returned 28384.3612
