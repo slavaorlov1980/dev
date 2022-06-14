@@ -1,7 +1,7 @@
 # Получить внешние данные по ссылке 
 # Отдать стоимость btc в нужной валюте 
 # Получить стоимость N btc в нужной валюте 
-# Вести логирование, и принт по необходимости import requests
+# Вести логирование, и принт по необходимости
 
 from datetime import date
 import requests
@@ -11,6 +11,18 @@ config: dict = {
     "url" : "https://api.coindesk.com/v2/bpi/currentprice.json",
     "log_file" : "bit_log.txt"
 } 
+
+
+def add_to_log_decorator(log_flag=False):
+    def logging(func):
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            if log_flag == True:
+                with open(config['log_file'], "a") as log:
+                    log.write(f"[{date.today()}] Function {func.__name__} returned {result}\n")
+            return result
+        return wrapper
+    return logging
 
 class BtcPrice:
     url: str = config["url"]
@@ -25,16 +37,6 @@ class BtcPrice:
         self.log_flag = log_flag
 
 
-    def add_to_log_decorator(log_flag=False):
-        def logging(func):
-            def wrapper(*args, **kwargs):
-                result = func(*args, **kwargs)
-                if log_flag == True:
-                    with open("bit_log.txt", "a") as log:
-                        log.write(f"[{date.today()}] Function {func.__name__} returned {result}\n")
-                return result
-            return wrapper
-        return logging
     
     def _get_data_from_api(self) -> dict:
         try:
@@ -57,9 +59,13 @@ class BtcPrice:
 
     @add_to_log_decorator(log_flag)
     def get_btc_rate_by_currency(self, currency: str) -> float:
-        if not self.btc_price_data.get(currency):
+        if not isinstance(currency, str):
+            raise TypeError("Валюта должна быть строкой")
+        elif not self.btc_price_data.get(currency):
             raise ValueError("Такой валюты не существует")
         rate = self.btc_price_data[currency]["rate_float"]
+        if not isinstance(rate, float):
+            raise ValueError("Сломанные данные в базе rate_float")
         return rate
 
     @add_to_log_decorator(log_flag)
@@ -67,13 +73,12 @@ class BtcPrice:
         btc_price = bit_count * self.get_btc_rate_by_currency(currency)
         return btc_price
 
-"""
+
 if __name__ == "__main__":
 
     currency = ("USD", "EUR")
     btc_count = 20
     btc_price_obj = BtcPrice()
-
     for i in currency:
         print(btc_price_obj.get_btc_rate_by_currency(i))
         print(btc_price_obj.get_btc_price_by_currency(btc_count, i))
@@ -92,19 +97,23 @@ def test_init_object():
     with pytest.raises(ConnectionError):
         btc_price_obj = BtcPrice(fail_request_url)
 
+
     with pytest.raises(ValueError):
         btc_price_obj = BtcPrice(fail_response_data)
-"""
+
+
 
 def test_get_btc_rate():
     btc_price_obj = BtcPrice()
+    with pytest.raises(TypeError) as e:
+        btc_price_obj.get_btc_rate_by_currency(1)
+    assert "Валюта должна быть строкой" in str(e.value)
     with pytest.raises(ValueError) as e:
         btc_price_obj.get_btc_rate_by_currency("RUB")
-
     assert "Такой валюты не существует" in str(e.value)
 
-    
 
-# def test_get_btc_price():
-#     btc_price_obj = BtcPrice()
-#     pass
+def test_get_btc_price():
+    btc_price_obj = BtcPrice()
+    with pytest.raises(TypeError):
+        btc_price_obj.get_btc_price_by_currency("ABR", 3)

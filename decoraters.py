@@ -38,16 +38,22 @@ def rout(path):
         return wrapper
     return actual_decorator
 
-@rout("/")
-@debug_print(log_flag=True)
+# @rout("/")
+# @debug_print(log_flag=True)
 def calculate(value_1, value_2):
     return value_1 * value_2
 
+def decor_func(func):
 
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+ 
 # "https://api.coindesk.com/v2/bpi/currentprice.json"
 
 if __name__ == "__main__":
-    calculate(3, 5)
+    calculate = decor_func(calculate)
+    
     # result = dispatcher(url)
     # result = "/"
     # path_dict[result]

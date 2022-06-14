@@ -1,8 +1,6 @@
-[2022-06-09] Function get_btc_rate_by_currency returned 30379.7844
-[2022-06-09] Function get_btc_rate_by_currency returned 30379.7844
-[2022-06-09] Function get_btc_price_by_currency returned 607595.688
-[2022-06-09] Function get_btc_rate_by_currency returned 28435.539
-[2022-06-09] Function get_btc_rate_by_currency returned 28435.539
-[2022-06-09] Function get_btc_price_by_currency returned 568710.78
-[2022-06-09] Function get_btc_rate_by_currency returned 30381.442
-[2022-06-09] Function get_btc_rate_by_currency returned 28384.3612
+[2022-06-12] Function get_btc_rate_by_currency returned 27423.4863
+[2022-06-12] Function get_btc_rate_by_currency returned 27423.4863
+[2022-06-12] Function get_btc_price_by_currency returned 548469.726
+[2022-06-12] Function get_btc_rate_by_currency returned 26067.9433
+[2022-06-12] Function get_btc_rate_by_currency returned 26067.9433
+[2022-06-12] Function get_btc_price_by_currency returned 521358.866
