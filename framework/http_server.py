@@ -32,7 +32,10 @@ class HttpGetHandler(BaseHTTPRequestHandler):
             if action == "auth":
                 result = view.func_path[action](param)
                 if result:
-                    self.send_header("Set-Cookie", "user_id=1234")
+                    cookie = SimpleCookie()
+                    cookie['user_id'] = '1234'
+                    cookie['user_id']['path'] = '/'
+                    self.send_header("Set-Cookie", cookie.output(header='',sep=''))
             elif cookies:
                 # print(f'{cookies =}')
                 auth_state = check_auth(cookies['user_id'].value)
