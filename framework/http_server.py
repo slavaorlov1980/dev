@@ -24,6 +24,10 @@ class HttpGetHandler(BaseHTTPRequestHandler):
             action, param = dispath(self.path)
         else:
             raise ValueError("Chozanax")
+
+        cookie = SimpleCookie()
+        cookie['user_id'] = '1234'
+        cookie['user_id']['path'] = '/'
         
         self.send_response(200)
         self.send_header("Content-type", "application/json")
@@ -31,16 +35,18 @@ class HttpGetHandler(BaseHTTPRequestHandler):
         if view.func_path.get(action):
             if action == "auth":
                 result = view.func_path[action](param)
-                if result:
-                    cookie = SimpleCookie()
-                    cookie['user_id'] = '1234'
-                    cookie['user_id']['path'] = '/'
+                if result == "Login is correct":
                     self.send_header("Set-Cookie", cookie.output(header='',sep=''))
             elif cookies:
-                # print(f'{cookies =}')
                 auth_state = check_auth(cookies['user_id'].value)
                 if auth_state:
-                    result = view.func_path[action](param)
+                    if action == "log_out":
+                        if "user_id" in cookies:
+                            cookie['user_id']['expires'] = "Sun, 06 Nov 1994 08:49:37 GMT"
+                            self.send_header("Set-Cookie", cookie.output(header='',sep=''))
+                            result = view.func_path[action]()
+                    else:
+                        result = view.func_path[action](param)
                 else:
                     result = "Ошибка авторизации"
             else:
