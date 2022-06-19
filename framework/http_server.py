@@ -1,11 +1,13 @@
+# MVC arch model
+
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 from http.cookies import SimpleCookie
 
 import view
 import json
+import model
 # Set-Cookie: <cookie-name>=<cookie-value>
-
 # router
 # Вызыае ACtion и передает входящие параметры
 # view  - Он и является функцией Action, принимает параметры
@@ -24,33 +26,35 @@ class HttpGetHandler(BaseHTTPRequestHandler):
             action, param = dispath(self.path)
         else:
             raise ValueError("Chozanax")
-
-        cookie = SimpleCookie()
-        cookie['user_id'] = '1234'
-        cookie['user_id']['path'] = '/'
-        
+    
+        print(view.func_path)
         self.send_response(200)
         self.send_header("Content-type", "application/json")
+        auth_data = {
+            "auth_status" : 0,
+            "user_login" : "",
+        }
+        if cookies.get("session_id"):
+            login = model.Session().check_session(cookie["session_id"])
+            if login:
+                auth_data["auth_status"] = 1
+                auth_data["user_login"] = login
 
         if view.func_path.get(action):
             if action == "auth":
-                result = view.func_path[action](param)
-                if result == "Login is correct":
+                result = view.func_path[action]["action"](param)
+                if result["result"]:
+                    cookie = SimpleCookie()
+                    cookie['session_id'] = model.Session().create_session(result["result"])
                     self.send_header("Set-Cookie", cookie.output(header='',sep=''))
-            elif cookies:
-                auth_state = check_auth(cookies['user_id'].value)
-                if auth_state:
-                    if action == "log_out":
-                        if "user_id" in cookies:
-                            cookie['user_id']['expires'] = "Sun, 06 Nov 1994 08:49:37 GMT"
-                            self.send_header("Set-Cookie", cookie.output(header='',sep=''))
-                            result = view.func_path[action]()
-                    else:
-                        result = view.func_path[action](param)
-                else:
-                    result = "Ошибка авторизации"
             else:
-                result = "Access denied for unregistered users"
+                if view.func_path[action]["auth"]:
+                    if auth_data.get("auth_status"):
+                        result = view.func_path[action]["action"](param)
+                    else:
+                        result = "Neeed auth"
+                else:
+                    result = view.func_path[action]["action"](param)
         else:
             result = "Ошибка 404 страница не найдена"
 

@@ -1,8 +1,15 @@
 import requests 
+import random
+import string
+import time
 
 
 config: dict = {
     "url" : "https://api.coindesk.com/v2/bpi/currentprice.json",
+    "login_db" : {'vasya' : '1234',
+                  'slava' : '123',
+                  'valery' : '321',
+                  }
 } 
 
 class BtcPrice:
@@ -51,3 +58,73 @@ class BtcPrice:
     def get_btc_price_by_currency(self, bit_count: int, currency: str) -> float:
         btc_price = bit_count * self.get_btc_rate_by_currency(currency)
         return btc_price
+
+class Auth:
+    user_data:str = "user.data"
+
+    def register_user(self, login:str, password:str) -> bool:
+        with open(self.user_data, "r") as file:
+            data_base = file.read().split(',')
+
+        with open(self.user_data, "a") as file:
+            for i in data_base:
+                if login == i.split(':')[0]:
+                    return False
+                else:
+                    file.write(f'{login}:{password},')
+                    return True
+
+
+    def check_auth(self, login:str, password:str) -> bool:
+        with open(self.user_data, 'r') as file:
+            data_base = file.read().split(',')
+            for i in data_base:
+                log, psw = i.split(':')
+                if login == log and password == psw:
+                    return True
+        return False
+
+class Session:
+    session_data:str = 'session.data'
+    ttl = 3600
+
+    def create_session(self, login:str)->str:
+        with open(self.session_data, 'a') as file:
+            session_id = self.get_random_string(50)
+            create_date  = int(time.time())
+            result = f'{create_date}:{login}:{session_id},'
+            file.write(result)
+        return result
+
+    def check_session(self, session_id:str)->str:
+        with open(self.session_data, 'r') as file:
+            session_data = file.read().split(',')
+            for i in session_data:
+                date, login, id = i.split(':')
+                time_now = int(time.time())
+                if session_id == id and time_now-date > self.ttl:
+                    return login
+        
+
+    def get_random_string(self, length:int)->str:
+        # choose from all lowercase letter
+        letters = string.ascii_lowercase
+        result_str = ''.join(random.choice(letters) for i in range(length))
+        # print("Random string of length", length, "is:", result_str)
+        return result_str
+
+
+
+# Имя класса:
+# Какие даныне этот класс представляет
+    # Есть файл user.data в котом лежат данные в виде
+    # login:passwd,login_2:passwd_2,
+# Общее описание класса 
+# Методы классаа
+# регистрация пользователя(вносит даные в файл user.data, принимает логин, пароль, возвращает обновленный файл)
+# проверка логина и пароля на наличие в базе (проверяет, зареган ли юзер. принимает логин, пароль. возвращает буль)
+
+#     Что делает метод
+#     Какие данные ему нужны для БЛ
+#     Какие данные он возвращает 
+
