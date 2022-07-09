@@ -6,36 +6,37 @@ from http.cookies import SimpleCookie
 
 import view
 import json
-import model
-# Set-Cookie: <cookie-name>=<cookie-value>
+import models
+
 # router
-# Вызыае ACtion и передает входящие параметры
+# Вызыает Action и передает входящие параметры
 # view  - Он и является функцией Action, принимает параметры
 # model - Бизнес логика приложения
 # render - Каким образом вернуть данные с сервера 
 # JOSN, HTML, JSONB, XML
 
+
 class HttpGetHandler(BaseHTTPRequestHandler):
     """Обработчик с реализованным методом do_GET."""
-# server 
+    # server
     def do_GET(self):
         cookies = SimpleCookie(self.headers.get('Cookie'))
-        print('headers =', self.headers)
-        auth_state = 0
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+
         if isinstance(dispath(self.path), list):
             action, param = dispath(self.path)
         else:
-            raise ValueError("Chozanax")
-    
-        print(view.func_path)
-        self.send_response(200)
-        self.send_header("Content-type", "application/json")
+            raise ValueError(dispath(self.path))
+
         auth_data = {
-            "auth_status" : 0,
-            "user_login" : "",
+            "auth_status": 0,
+            "user_login": "",
         }
+
         if cookies.get("session_id"):
-            login = model.Session().check_session(cookie["session_id"])
+            session_string = cookies['session_id'].value
+            login = models.session.Session().check_session(session_string)
             if login:
                 auth_data["auth_status"] = 1
                 auth_data["user_login"] = login
@@ -45,21 +46,26 @@ class HttpGetHandler(BaseHTTPRequestHandler):
                 result = view.func_path[action]["action"](param)
                 if result["result"]:
                     cookie = SimpleCookie()
-                    cookie['session_id'] = model.Session().create_session(result["result"])
-                    self.send_header("Set-Cookie", cookie.output(header='',sep=''))
+                    cookie['session_id'] = models.session.Session().create_session(result["result"])
+                    cookie['session_id']['path'] = '/'
+                    self.send_header("Set-Cookie", cookie.output(header='', sep=''))
+                    result = "User logged in, session active"
+                else:
+                    result = result["error"]
             else:
                 if view.func_path[action]["auth"]:
                     if auth_data.get("auth_status"):
-                        result = view.func_path[action]["action"](param)
+                        result = view.func_path[action]["action"](*param)
                     else:
-                        result = "Neeed auth"
+                        result = "Need authorization"
                 else:
+                    
                     result = view.func_path[action]["action"](param)
         else:
             result = "Ошибка 404 страница не найдена"
 
         self.end_headers()
-        
+
         self.wfile.write(render(result).encode())
 
 
@@ -71,31 +77,34 @@ def run(server_class=HTTPServer, handler_class=HttpGetHandler):
     except KeyboardInterrupt:
         httpd.server_close()
 
-# dispatcher - path 
+# dispatcher - path
 # https:// - Тип соединения
-# habr.com - Домен 
+# habr.com - Домен
 # /ru      - Параметр языка
 # /post    - Action
 # /670872  - Переменная, id поста который нужно отдать
 
-def render(data, error = ""):
-    result =  {
-        "result" : data,
-        "error" : error,
+
+def render(data, error=""):
+    result = {
+        "result": data,
+        "error": error,
     }
     return json.dumps(result)
 
-def dispath(path:str)->list:
+
+def dispath(path: str) -> list:
     path_list = path.split('/')
-    if len(path_list) != 4:
-        return "Wrong input"
+    if len(path_list) < 3:
+        print("Wrong input")
     else:
         action = path_list[2]
-        param = path_list[3]
+
+        if len(path_list) > 3:
+            param = path_list[3].split(",")
+        else:
+            param = []
+
         return [action, param]
 
-def check_auth(cookie_value:str)->bool:
-    if cookie_value == '1234':
-        return True
-    else:
-        return False
+# def check_auth(cookie_value:str)->bool:
