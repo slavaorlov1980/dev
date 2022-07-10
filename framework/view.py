@@ -20,8 +20,8 @@ def rout(path, auth=1):
 
 
 @rout('reg', auth=0)
-def reg(log_pass):
-    login, password = log_pass
+def reg(login, password):
+    # login, password = log_pass
     if models.auth.Auth().register_user(login, password):
         models.session.Session().create_session(login)
         return "User registered"
@@ -30,16 +30,16 @@ def reg(log_pass):
 
 
 @rout("auth", auth=0)
-def auth(log_pass):
+def auth(login, password):
     result = {
         "result": "",
         "error": "",
     }
-    if len(log_pass) != 2:
+    if not login or not password:
         result["error"] = "Wrong login and password"
         return result
     else:
-        login, password = log_pass
+        # login, password = log_pass
         if models.auth.Auth().check_auth(login, password):
             result["result"] = login
             return result
@@ -70,13 +70,13 @@ def post_list():
 
 
 @rout("most_popular")
-def most_popular(*args):
+def most_popular():
     name = models.rick_and_morty.CharList().most_popular_char()
     return name
 
 
 @rout("most_popular_dead")
-def most_popular_dead(*args):
+def most_popular_dead():
     name = models.rick_and_morty.CharList().most_popular_dead()
     return name
 

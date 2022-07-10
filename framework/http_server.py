@@ -43,7 +43,7 @@ class HttpGetHandler(BaseHTTPRequestHandler):
 
         if view.func_path.get(action):
             if action == "auth":
-                result = view.func_path[action]["action"](param)
+                result = view.func_path[action]["action"](*param)
                 if result["result"]:
                     cookie = SimpleCookie()
                     cookie['session_id'] = models.session.Session().create_session(result["result"])
@@ -60,7 +60,7 @@ class HttpGetHandler(BaseHTTPRequestHandler):
                         result = "Need authorization"
                 else:
                     
-                    result = view.func_path[action]["action"](param)
+                    result = view.func_path[action]["action"](*param)
         else:
             result = "Ошибка 404 страница не найдена"
 
